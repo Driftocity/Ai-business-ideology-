@@ -53,7 +53,7 @@ Industry: ${industry}
 Budget: ${budget}`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       contents: prompt,
     });
 
@@ -88,7 +88,7 @@ Target Customer Type: ${customer}
 Core Problem Solved: ${problem}`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       contents: prompt,
     });
 
@@ -129,7 +129,7 @@ Problem Solved: ${problem}
 Be incredibly specific and practical. Avoid generic filler. For example, suggest real pricing figures, specific marketing tactics suitable for the budget, and exact steps. Each section should have 3-6 sentences or clear bullet points. Total length should be around 500-600 words. Write like a deeply caring mentor who wants them to succeed.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       contents: prompt,
     });
 
@@ -165,7 +165,7 @@ Produce exactly 4 key, highly professional points for each of the four SWOT cate
 Ensure each point is actionable, concise (10-15 words), and tailored exactly to this business.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -227,7 +227,7 @@ Make the Elevator Pitch memorable, punchy, starting with a powerful hook.
 Make the Cold Outreach Email extremely direct, with a clear value proposition, an engaging subject line, and a single friction-free call-to-action (CTA). Avoid generic fluff. Make sure both reflect the specified tone.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -281,7 +281,7 @@ Founder's Question: "${message}"
 Write a concise, extremely high-value, highly specific, and practical response (max 3 short paragraphs or clean bullet points). Give actual, direct tactical ideas, slogans, or channel structures. Do not speak in vague generalities. Be encouraging and direct.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       contents: prompt,
     });
 

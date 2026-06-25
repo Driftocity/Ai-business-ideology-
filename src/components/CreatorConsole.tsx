@@ -63,17 +63,39 @@ export default function CreatorConsole({
   triggerFullPlan,
   onReset
 }: CreatorConsoleProps) {
+  // Check URL parameters or sessionStorage to see if the seller panel should be visible
+  const [isVisible, setIsVisible] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const hasParam = params.get("admin") === "true" || params.get("seller") === "true" || params.get("creator") === "true";
+    const wasUnlocked = sessionStorage.getItem("launchmind_seller_unlocked") === "true";
+    const wasVisible = sessionStorage.getItem("launchmind_seller_visible") === "true";
+    
+    if (hasParam) {
+      sessionStorage.setItem("launchmind_seller_visible", "true");
+      return true;
+    }
+    return wasUnlocked || wasVisible;
+  });
+
   const [isOpen, setIsOpen] = useState(false);
   const [passcode, setPasscode] = useState("");
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(() => {
+    return sessionStorage.getItem("launchmind_seller_unlocked") === "true";
+  });
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
   const [isInjecting, setIsInjecting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleUnlock = (e: React.FormEvent) => {
     e.preventDefault();
-    // Allow any input for ease of use, but seed with ADMIN
-    if (passcode.trim().toUpperCase() === "ADMIN" || passcode.trim() !== "") {
+    // Strict secure passcode check
+    const secretPasscode = "LaunchMind2026!";
+    if (passcode.trim() === secretPasscode) {
       setIsUnlocked(true);
+      setErrorMsg("");
+      sessionStorage.setItem("launchmind_seller_unlocked", "true");
+    } else {
+      setErrorMsg("Invalid secret passcode. Please try again.");
     }
   };
 
@@ -130,6 +152,10 @@ export default function CreatorConsole({
     triggerFullPlan(upgradedData);
     setIsOpen(false);
   };
+
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <>
@@ -191,10 +217,17 @@ export default function CreatorConsole({
                         Unlock seller presets and instant bypass tools
                       </p>
                     </div>
+                    
+                    {errorMsg && (
+                      <p className="text-xs text-red-400 font-semibold bg-red-500/10 py-1.5 px-3 rounded-lg max-w-xs mx-auto animate-shake">
+                        {errorMsg}
+                      </p>
+                    )}
+
                     <div className="max-w-xs mx-auto flex gap-2">
                       <input
-                        type="text"
-                        placeholder="Type 'ADMIN' to continue"
+                        type="password"
+                        placeholder="Enter secret seller passcode"
                         value={passcode}
                         onChange={(e) => setPasscode(e.target.value)}
                         className="bg-[#080b12] border border-[#2d3a5a] rounded-xl px-4 py-3 text-sm text-white w-full text-center font-mono focus:outline-none focus:border-indigo-500"
@@ -207,9 +240,6 @@ export default function CreatorConsole({
                         Enter
                       </button>
                     </div>
-                    <p className="text-[10px] text-[#525a75]">
-                      (Any password will be accepted for prompt evaluation)
-                    </p>
                   </form>
                 ) : (
                   /* Unlocked Console Content */
