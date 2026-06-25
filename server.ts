@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -137,6 +137,158 @@ Be incredibly specific and practical. Avoid generic filler. For example, suggest
   } catch (error: any) {
     console.error("Error in generate-plan API:", error);
     res.status(500).json({ error: error.message || "Failed to generate business plan." });
+  }
+});
+
+// 4. Generate SWOT Analysis
+app.post("/api/generate-swot", async (req, res) => {
+  try {
+    const { idea, industry, customer, problem } = req.body;
+    if (!idea || !industry || !customer || !problem) {
+      res.status(400).json({ error: "Missing required fields: idea, industry, customer, problem" });
+      return;
+    }
+
+    const ai = getAi();
+    const prompt = `Conduct a comprehensive, highly realistic SWOT Analysis for this business idea.
+Venture: ${idea}
+Industry: ${industry}
+Target Customer: ${customer}
+Pain Point: ${problem}
+
+Produce exactly 4 key, highly professional points for each of the four SWOT categories:
+- Strengths (Internal advantages, unique intellectual assets, capital efficiency)
+- Weaknesses (Internal limitations, resource constraints, high friction areas)
+- Opportunities (External growth drivers, tech tailwinds, regulatory shifts, adjacent markets)
+- Threats (External risks, aggressive competitors, economic downturns, customer retention issues)
+
+Ensure each point is actionable, concise (10-15 words), and tailored exactly to this business.`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            strengths: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: "4 key internal strengths"
+            },
+            weaknesses: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: "4 key internal weaknesses"
+            },
+            opportunities: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: "4 key external opportunities"
+            },
+            threats: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: "4 key external threats"
+            }
+          },
+          required: ["strengths", "weaknesses", "opportunities", "threats"]
+        }
+      }
+    });
+
+    const parsedData = JSON.parse(response.text || "{}");
+    res.json(parsedData);
+  } catch (error: any) {
+    console.error("Error in generate-swot API:", error);
+    res.status(500).json({ error: error.message || "Failed to conduct SWOT analysis." });
+  }
+});
+
+// 5. Generate Investor Pitch & Cold Outreach
+app.post("/api/generate-pitch", async (req, res) => {
+  try {
+    const { idea, industry, customer, problem, tone } = req.body;
+    if (!idea || !industry || !customer || !problem || !tone) {
+      res.status(400).json({ error: "Missing required fields: idea, industry, customer, problem, tone" });
+      return;
+    }
+
+    const ai = getAi();
+    const prompt = `Craft an elite, highly converting spoken Elevator Pitch (30 seconds) and an Investor/Partner Cold Outreach Email for this startup.
+Venture: ${idea}
+Industry: ${industry}
+Target Customer: ${customer}
+Problem Solved: ${problem}
+Required Tone: ${tone} (e.g. bold, visionary, data-driven, casual but professional)
+
+Make the Elevator Pitch memorable, punchy, starting with a powerful hook.
+Make the Cold Outreach Email extremely direct, with a clear value proposition, an engaging subject line, and a single friction-free call-to-action (CTA). Avoid generic fluff. Make sure both reflect the specified tone.`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            elevatorPitch: {
+              type: Type.STRING,
+              description: "The spoken 30-second elevator pitch starting with a hook"
+            },
+            coldEmail: {
+              type: Type.STRING,
+              description: "An investor-ready cold outreach email with subject line and call-to-action"
+            }
+          },
+          required: ["elevatorPitch", "coldEmail"]
+        }
+      }
+    });
+
+    const parsedData = JSON.parse(response.text || "{}");
+    res.json(parsedData);
+  } catch (error: any) {
+    console.error("Error in generate-pitch API:", error);
+    res.status(500).json({ error: error.message || "Failed to generate elevator pitch and email." });
+  }
+});
+
+// 6. Interactive Advisor Chat (Q&A with Plan)
+app.post("/api/chat-plan", async (req, res) => {
+  try {
+    const { message, planContext, chatHistory } = req.body;
+    if (!message || !planContext) {
+      res.status(400).json({ error: "Missing required fields: message, planContext" });
+      return;
+    }
+
+    const ai = getAi();
+    const historyPrompt = chatHistory && chatHistory.length > 0
+      ? chatHistory.map((ch: any) => `${ch.role === "user" ? "Founder" : "AI Consultant"}: ${ch.text}`).join("\n")
+      : "";
+
+    const prompt = `You are the lead startup architect and co-pilot at LaunchMind. You have constructed a comprehensive business plan and are now chatting with the founder.
+    
+Here is the business context & plan:
+${planContext}
+
+${historyPrompt ? `Here is the current conversation history:\n${historyPrompt}\n` : ""}
+Founder's Question: "${message}"
+
+Write a concise, extremely high-value, highly specific, and practical response (max 3 short paragraphs or clean bullet points). Give actual, direct tactical ideas, slogans, or channel structures. Do not speak in vague generalities. Be encouraging and direct.`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: prompt,
+    });
+
+    res.json({ reply: response.text });
+  } catch (error: any) {
+    console.error("Error in chat-plan API:", error);
+    res.status(500).json({ error: error.message || "Failed to consult with business plan." });
   }
 });
 

@@ -7,6 +7,16 @@ export interface UserData {
   validation?: string;
   market?: string;
   fullPlan?: string;
+  swot?: {
+    strengths: string[];
+    weaknesses: string[];
+    opportunities: string[];
+    threats: string[];
+  };
+  pitch?: {
+    elevatorPitch: string;
+    coldEmail: string;
+  };
   isPaid?: boolean;
 }
 
