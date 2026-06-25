@@ -1,15 +1,8 @@
-import { Sparkles, HelpCircle } from "lucide-react";
+import React from "react";
+import { Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 
-interface HeaderProps {
-  userEmail?: string;
-}
-
-export default function Header({ userEmail }: HeaderProps) {
-  // Extract initial or name prefix from email
-  const userInitial = userEmail ? userEmail.charAt(0).toUpperCase() : "R";
-  const shortEmail = userEmail ? userEmail.split("@")[0] : "Ray";
-
+export default function Header() {
   return (
     <header className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 px-2">
       {/* Brand Logo & Name */}
@@ -32,8 +25,8 @@ export default function Header({ userEmail }: HeaderProps) {
         {/* Avatars & Count */}
         <div className="flex items-center gap-2">
           <div className="flex -space-x-2">
-            <div className="w-7 h-7 rounded-full border-2 border-[#0b0f1a] bg-slate-700 flex items-center justify-center text-[10px] font-bold">JD</div>
-            <div className="w-7 h-7 rounded-full border-2 border-[#0b0f1a] bg-[#6c63ff] flex items-center justify-center text-[10px] font-bold text-white">ML</div>
+            <div className="w-7 h-7 rounded-full border-2 border-[#0b0f1a] bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-300">JD</div>
+            <div className="w-7 h-7 rounded-full border-2 border-[#0b0f1a] bg-[#6c63ff] flex items-center justify-center text-[10px] font-bold text-white">F</div>
             <div className="w-7 h-7 rounded-full border-2 border-[#0b0f1a] bg-[#22d3a0] flex items-center justify-center text-[10px] font-bold text-[#0b1a14]">AI</div>
           </div>
           <span className="text-xs text-[#7b82a0] font-medium">
@@ -41,14 +34,15 @@ export default function Header({ userEmail }: HeaderProps) {
           </span>
         </div>
 
-        {/* User Session Token / Email Tag */}
-        <div className="flex items-center gap-2 bg-[#131928] border border-[#1e2840] rounded-lg px-3 py-1.5 text-xs text-slate-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#22d3a0]" />
-          <span className="font-mono max-w-[120px] truncate" title={userEmail || "Guest Partner"}>
-            {shortEmail}
+        {/* User Session Token / Anonymous Secure Status Tag */}
+        <div className="flex items-center gap-2 bg-[#131928] border border-[#1e2840] rounded-lg px-3 py-1.5 text-xs text-slate-300 select-none">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#22d3a0] animate-pulse" />
+          <span className="font-mono text-slate-300 tracking-wide font-medium">
+            Secure Session Active
           </span>
         </div>
       </div>
     </header>
   );
 }
+

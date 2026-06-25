@@ -5,6 +5,7 @@ import StepIdea from "./components/StepIdea";
 import StepMarket from "./components/StepMarket";
 import StepPaywall from "./components/StepPaywall";
 import StepFullPlan from "./components/StepFullPlan";
+import CreatorConsole from "./components/CreatorConsole";
 import { UserData, StepNumber } from "./types";
 
 export default function App() {
@@ -75,6 +76,18 @@ export default function App() {
       }
     }
   }, []);
+
+  const handleReset = () => {
+    sessionStorage.removeItem("launchmind_data");
+    setUserData({
+      idea: "",
+      industry: "",
+      budget: "",
+      customer: "",
+      problem: "",
+    });
+    setCurrentStep(1);
+  };
 
   const saveToSession = (newData: UserData) => {
     sessionStorage.setItem("launchmind_data", JSON.stringify(newData));
@@ -284,7 +297,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0b0f1a] font-sans text-[#e8eaf6] flex flex-col p-4 sm:p-6 md:p-8">
       {/* Bento Header */}
-      <Header userEmail="RAYMONDHOCKERSMITH@gmail.com" />
+      <Header />
 
       {/* Main Bento Grid Container */}
       <main className="grid grid-cols-1 md:grid-cols-12 md:grid-rows-6 gap-5 flex-grow max-w-7xl w-full mx-auto mt-2">
@@ -571,6 +584,15 @@ export default function App() {
           © 2026 LAUNCHMIND INTELLIGENCE SYSTEM. ALL RIGHTS RESERVED. · SUPPORT@LAUNCHMIND.AI
         </div>
       </footer>
+
+      {/* Seller/Creator Admin Console */}
+      <CreatorConsole
+        userData={userData}
+        setUserData={setUserData}
+        setCurrentStep={setCurrentStep}
+        triggerFullPlan={triggerFullPlanGeneration}
+        onReset={handleReset}
+      />
     </div>
   );
 }

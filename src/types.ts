@@ -1,4 +1,5 @@
 export interface UserData {
+  email?: string;
   idea: string;
   industry: string;
   budget: string;
